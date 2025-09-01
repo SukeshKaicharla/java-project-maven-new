@@ -23,7 +23,7 @@ pipeline {
             steps {
                 sh '''
                     docker rmi -f $DOCKER_IMAGE:v1 || true
-                    docker build -t $DOCKER_IMAGE:v1 .
+                    docker build -t $DOCKER_IMAGE:v1 -f /var/lib/jenkins/workspace/hotstar/Dockerfile /var/lib/jenkins/workspace/hotstar
                 '''
             }
         }
