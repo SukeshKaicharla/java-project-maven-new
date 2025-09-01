@@ -22,8 +22,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    docker rmi -f $DOCKER_IMAGE:v1 || true
-                    docker build -t $DOCKER_IMAGE:v1 -f /var/lib/jenkins/workspace/hotstar/Dockerfile /var/lib/jenkins/workspace/hotstar
+                    docker rmi -f hotstarimg:v1 || true
+                    docker build -t hotstarcont:v1 -f /var/lib/jenkins/workspace/hotstar/Dockerfile /var/lib/jenkins/workspace/hotstar
                 '''
             }
         }
@@ -31,8 +31,8 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 sh '''
-                    docker rm -f $CONTAINER_NAME || true
-                    docker run -itd --name $CONTAINER_NAME -p 6320:8080 $DOCKER_IMAGE:v1
+                    docker rm -f hotstarcont || true
+                    docker run -itd --name hotstar -p 6320:8080 hotstar:v1
                 '''
             }
         }
