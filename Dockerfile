@@ -1,7 +1,7 @@
 # Step 1: Use official Tomcat as base image
 FROM tomcat:9.0-jdk17-openjdk
 
-# Step 2: Remove default apps (optional but clean)
+# Step 2: Remove default apps
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Step 3: Copy WAR file built by Maven
