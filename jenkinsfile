@@ -1,0 +1,47 @@
+
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "hotstarimg"
+        CONTAINER_NAME = "hotstarcont"
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'master', url: 'https://github.com/SukeshKaicharla/java-project-maven-new.git'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                sh '''
+                    echo "Starting new container..."
+                    docker run -itd --name $CONTAINER_NAME -p 9090:8080 $DOCKER_IMAGE
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Application is running on http://<server-ip>:9090"
+        }
+        failure {
+            echo "Pipeline failed. Check logs."
+        }
+    }
+}
