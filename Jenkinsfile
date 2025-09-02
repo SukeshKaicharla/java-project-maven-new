@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-cred')
+        DOCKER_IMAGE = "sukesh632k/hotstarimg:v1"
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -17,8 +22,18 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    docker rmi -f hotstarimg:v1 || true
-                    docker build -t hotstarimg:v1 -f /var/lib/jenkins/workspace/hotstar/Dockerfile /var/lib/jenkins/workspace/hotstar
+                    docker rmi -f $DOCKER_IMAGE || true
+                    docker build -t $DOCKER_IMAGE -f /var/lib/jenkins/workspace/hotstar/Dockerfile /var/lib/jenkins/workspace/hotstar
+                '''
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                sh '''
+                    echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin
+                    docker push $DOCKER_IMAGE
+                    docker logout
                 '''
             }
         }
@@ -27,7 +42,7 @@ pipeline {
             steps {
                 sh '''
                     docker rm -f hotstarcont || true
-                    docker run -itd --name hotstarcont -p 6320:8080 hotstarimg:v1
+                    docker run -itd --name hotstarcont -p 6320:8080 $DOCKER_IMAGE
                 '''
             }
         }
